@@ -6,7 +6,7 @@ Steam Proton Browser discovers your installed games, resolves opaque App IDs to 
 
 ## Features
 
-- **Zero-config discovery** — auto-detects Steam installations, library folders, and Proton prefixes on Linux (native, Flatpak, Snap), macOS, and Windows.
+- **Zero-config discovery** — auto-detects Steam installations, library folders, and Proton prefixes on Linux (native, Flatpak, Snap) and Steam Deck.
 - **Drill-down navigation** — Library → Game → Folder Category → File Browser, with breadcrumb trail.
 - **Vim-style keybindings** — `j`/`k` to navigate, `Enter` to drill in, `Esc` to go back, `/` to fuzzy filter.
 - **Open anywhere** — press `o` to open a folder in your OS file explorer, `Enter` on a file to open it, `e` to edit in `$EDITOR`.
@@ -92,12 +92,10 @@ When you select a game, Steam Proton Browser shows all existing folders for that
 
 | Platform | Status |
 |----------|--------|
-| Linux (native Steam) | ✅ |
-| Linux (Flatpak Steam) | ✅ |
-| Linux (Snap Steam) | ✅ |
-| Steam Deck | ✅ |
-| macOS | ✅ |
-| Windows | ✅ |
+| Linux (native Steam) | ✅ Tested |
+| Linux (Flatpak Steam) | 🔧 Untested, should work |
+| Linux (Snap Steam) | 🔧 Untested, should work |
+| Steam Deck | 🔧 Untested, should work |
 
 ## Development
 

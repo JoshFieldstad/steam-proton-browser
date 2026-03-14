@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Navigating Steam's file structure — especially Proton compatibility layer prefixes, shader caches, and per-game configuration — is painful. Paths are deeply nested, use opaque numeric App IDs, and vary across platforms (Linux native, Steam Deck, Flatpak, Windows). Users who need to access these folders for modding, troubleshooting, or cleanup are forced to memorize or repeatedly look up paths like:
+Navigating Steam's file structure — especially Proton compatibility layer prefixes, shader caches, and per-game configuration — is painful. Paths are deeply nested, use opaque numeric App IDs, and vary across platforms (Linux native, Steam Deck, Flatpak). Users who need to access these folders for modding, troubleshooting, or cleanup are forced to memorize or repeatedly look up paths like:
 
 ```
 ~/.steam/steam/steamapps/compatdata/<appid>/pfx/drive_c/users/steamuser/...
@@ -18,7 +18,7 @@ There is no first-class tool that maps **human-readable game titles** to the und
 2. **Resolves** each title's App ID to its on-disk folders (install dir, Proton prefix, shader cache, workshop content, cloud saves, etc.).
 3. **Presents** a drill-down hierarchy: Library → Game → Folder Category → File Browser.
 4. **Opens** any selected folder in the system's native file explorer with a single keypress.
-5. Works **cross-platform** (Linux, macOS, Windows) — though the Proton/compatdata paths are Linux/Steam Deck–centric, the tool should also surface the common Steam folders on Windows and macOS.
+5. Targets **Linux** — including native Steam, Flatpak, Snap, and Steam Deck.
 
 ## Goals
 
@@ -27,8 +27,8 @@ There is no first-class tool that maps **human-readable game titles** to the und
 | G1 | **Zero-config discovery** | Auto-detect Steam installation paths, library folders, and Proton prefixes without manual setup. |
 | G2 | **Human-readable game list** | Map numeric App IDs → game names using `appmanifest_*.acf` files. |
 | G3 | **Fast keyboard navigation** | Vim-style key bindings, fuzzy search/filter, breadcrumb trail. |
-| G4 | **Open in file explorer** | One keypress to open any folder in the OS file manager (xdg-open, open, explorer.exe). |
-| G5 | **Cross-platform** | Linux (native + Flatpak Steam), Steam Deck, macOS, Windows. |
+| G4 | **Open in file explorer** | One keypress to open any folder in the OS file manager (`xdg-open`). |
+| G5 | **Linux-focused** | Linux (native + Flatpak + Snap Steam), Steam Deck. |
 | G6 | **Minimal dependencies** | Single static binary, no runtime requirements. |
 | G7 | **Extensible folder map** | Users can define custom folder categories or path patterns. |
 

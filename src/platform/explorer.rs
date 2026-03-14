@@ -37,9 +37,5 @@ pub fn open_in_editor(path: &Path) -> Result<()> {
 }
 
 fn default_editor() -> &'static str {
-    if cfg!(target_os = "windows") {
-        "notepad"
-    } else {
-        "vi"
-    }
+    "vi"
 }

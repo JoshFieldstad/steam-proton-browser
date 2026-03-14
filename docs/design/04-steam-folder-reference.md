@@ -23,18 +23,6 @@ This document maps out the Steam directory layout across platforms. This is the 
 ~/snap/steam/common/.local/share/Steam/
 ```
 
-### macOS
-
-```
-~/Library/Application Support/Steam/
-```
-
-### Windows
-
-```
-C:\Program Files (x86)\Steam\
-```
-
 ## Key Paths Relative to Steam Root
 
 ### Library Folders Config
@@ -173,8 +161,6 @@ The app maintains a local cache to avoid re-scanning Steam directories on every 
 | Platform | Path |
 |----------|------|
 | Linux | `~/.cache/steam-proton-browser/cache.toml` |
-| macOS | `~/Library/Caches/steam-proton-browser/cache.toml` |
-| Windows | `%LOCALAPPDATA%\steam-proton-browser\cache\cache.toml` |
 
 ### Cache Format
 
@@ -232,14 +218,12 @@ When the cache is stale, the app performs a full discovery scan and overwrites `
 ## Platform Detection Strategy
 
 ```
-1. Check known default paths for current OS
-2. On Linux, also check:
-   a. Flatpak path (~/.var/app/com.valvesoftware.Steam/...)
-   b. Snap path (~/snap/steam/...)
-   c. Follow symlinks (~/.steam/steam → real path)
-3. On Windows, check registry:
-   HKCU\Software\Valve\Steam → SteamPath
-4. Parse libraryfolders.vdf for additional library locations
-5. Validate each path exists before adding to library list
-6. Write all discovered paths to cache.toml
+1. Check known default paths:
+   a. ~/.local/share/Steam/
+   b. ~/.steam/steam/ (follow symlinks)
+   c. Flatpak path (~/.var/app/com.valvesoftware.Steam/...)
+   d. Snap path (~/snap/steam/...)
+2. Parse libraryfolders.vdf for additional library locations
+3. Validate each path exists before adding to library list
+4. Write all discovered paths to cache.toml
 ```

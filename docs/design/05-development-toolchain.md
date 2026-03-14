@@ -19,17 +19,9 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 ### Cross-Compilation Targets (optional)
 
-For building release binaries on CI or locally for other platforms:
-
 ```sh
 # Linux static binary (musl)
 rustup target add x86_64-unknown-linux-musl
-
-# Windows from Linux
-rustup target add x86_64-pc-windows-gnu
-
-# macOS (only works on macOS hosts)
-rustup target add aarch64-apple-darwin x86_64-apple-darwin
 ```
 
 ### System Dependencies
@@ -38,8 +30,6 @@ rustup target add aarch64-apple-darwin x86_64-apple-darwin
 |----------|----------|---------|
 | Linux (Debian/Ubuntu) | `build-essential`, `pkg-config` | C linker, build tools. |
 | Linux (musl builds) | `musl-tools` | Static linking via musl. |
-| macOS | Xcode Command Line Tools (`xcode-select --install`) | C linker, system headers. |
-| Windows | Visual Studio Build Tools (MSVC) or `mingw-w64` | C linker. |
 
 ### Optional Dev Tools
 

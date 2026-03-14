@@ -31,59 +31,6 @@ fn platform_candidates() -> Vec<PathBuf> {
     dedup_by_canonical(paths)
 }
 
-#[cfg(target_os = "macos")]
-fn platform_candidates() -> Vec<PathBuf> {
-    let mut paths = Vec::new();
-    if let Some(home) = dirs::home_dir() {
-        paths.push(home.join("Library/Application Support/Steam"));
-    }
-    paths
-}
-
-#[cfg(target_os = "windows")]
-fn platform_candidates() -> Vec<PathBuf> {
-    let mut paths = Vec::new();
-
-    // Try the Windows registry first
-    if let Some(path) = read_steam_registry_path() {
-        paths.push(PathBuf::from(path));
-    }
-
-    // Common default
-    paths.push(PathBuf::from(r"C:\Program Files (x86)\Steam"));
-
-    dedup_by_canonical(paths)
-}
-
-#[cfg(target_os = "windows")]
-fn read_steam_registry_path() -> Option<String> {
-    use std::process::Command;
-
-    // Query the registry for Steam's install path
-    let output = Command::new("reg")
-        .args([
-            "query",
-            r"HKCU\Software\Valve\Steam",
-            "/v",
-            "SteamPath",
-        ])
-        .output()
-        .ok()?;
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    // Parse the REG_SZ value from the output
-    for line in stdout.lines() {
-        if let Some(rest) = line.trim().strip_prefix("SteamPath") {
-            let value = rest.trim().strip_prefix("REG_SZ")?.trim();
-            if !value.is_empty() {
-                return Some(value.to_string());
-            }
-        }
-    }
-
-    None
-}
-
 /// Resolve symlinks and remove duplicate paths that point to the same location.
 fn dedup_by_canonical(paths: Vec<PathBuf>) -> Vec<PathBuf> {
     let mut seen = Vec::new();
