@@ -60,9 +60,6 @@ pub enum ParseError {
     UnexpectedEof,
     #[error("expected '\"' at position {0}")]
     ExpectedQuote(usize),
-    #[error("expected '{{' at position {0}")]
-    #[allow(dead_code)]
-    ExpectedOpenBrace(usize),
     #[error("unexpected character '{0}' at position {1}")]
     UnexpectedChar(char, usize),
 }

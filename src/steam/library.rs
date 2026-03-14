@@ -46,15 +46,6 @@ pub struct Library {
     pub games: Vec<GameInfo>,
 }
 
-impl Library {
-    #[allow(dead_code)]
-    pub fn games_sorted_by_name(&self) -> Vec<&GameInfo> {
-        let mut sorted: Vec<&GameInfo> = self.games.iter().collect();
-        sorted.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
-        sorted
-    }
-}
-
 /// Scan all library folders reachable from the given Steam roots and build a `Library`.
 pub fn scan_libraries(steam_roots: &[PathBuf]) -> Result<Library> {
     let mut all_library_folders = Vec::new();

@@ -22,11 +22,20 @@ struct Cli {
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    let steam_roots = if let Some(ref path) = cli.steam_path {
+    let config_path = config::settings::config_file_path();
+    let settings = config::persistence::load(&config_path);
+
+    let mut steam_roots = if let Some(ref path) = cli.steam_path {
         vec![std::path::PathBuf::from(path)]
     } else {
         steam::discovery::discover_steam_roots()
     };
+
+    for extra in &settings.extra_steam_paths {
+        if extra.is_dir() && !steam_roots.contains(extra) {
+            steam_roots.push(extra.clone());
+        }
+    }
 
     if steam_roots.is_empty() {
         anyhow::bail!("No Steam installation found. Use --steam-path to specify one manually.");
