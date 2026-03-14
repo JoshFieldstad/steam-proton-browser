@@ -19,9 +19,7 @@ fn platform_candidates() -> Vec<PathBuf> {
         paths.push(home.join(".steam/steam"));
 
         // Flatpak
-        paths.push(
-            home.join(".var/app/com.valvesoftware.Steam/.local/share/Steam"),
-        );
+        paths.push(home.join(".var/app/com.valvesoftware.Steam/.local/share/Steam"));
 
         // Snap
         paths.push(home.join("snap/steam/common/.local/share/Steam"));

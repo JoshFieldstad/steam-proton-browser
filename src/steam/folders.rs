@@ -52,10 +52,7 @@ pub fn resolve_folders(
         let userdata = root.join("userdata");
         if let Ok(users) = std::fs::read_dir(&userdata) {
             for user_entry in users.flatten() {
-                let remote = user_entry
-                    .path()
-                    .join(app_id.to_string())
-                    .join("remote");
+                let remote = user_entry.path().join(app_id.to_string()).join("remote");
                 push_if_exists(&mut entries, "Cloud Saves", &remote);
             }
         }

@@ -1,10 +1,10 @@
 //! Reusable TUI widget helpers.
 
 use ratatui::{
+    Frame,
     layout::Rect,
     text::{Line, Span},
     widgets::{Block, Borders, Paragraph},
-    Frame,
 };
 
 use super::theme;
@@ -46,8 +46,7 @@ pub fn render_status_bar(frame: &mut Frame, area: Rect, hints: &[(&str, &str)]) 
         .collect();
 
     let line = Line::from(spans);
-    let paragraph = Paragraph::new(line)
-        .style(theme::status_bar());
+    let paragraph = Paragraph::new(line).style(theme::status_bar());
     frame.render_widget(paragraph, area);
 }
 

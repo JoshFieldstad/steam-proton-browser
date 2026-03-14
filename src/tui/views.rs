@@ -1,10 +1,10 @@
 //! View rendering — Library, Game Detail, and Folder Browser views.
 
 use ratatui::{
+    Frame,
     layout::{Constraint, Rect},
     text::{Line, Span},
     widgets::{Cell, List, ListItem, ListState, Row, Table, TableState},
-    Frame,
 };
 
 use crate::steam::{folders::FolderEntry, library::GameInfo};
@@ -77,19 +77,13 @@ pub fn render_game_table(
         .map(|g| {
             let size = widgets::format_size(g.size_on_disk);
             let last_played = widgets::format_last_played(g.last_played);
-            let lib_path = g
-                .library_path
-                .to_string_lossy()
-                .to_string();
+            let lib_path = g.library_path.to_string_lossy().to_string();
 
             let mut cells = Vec::new();
 
             if width >= 80 {
                 cells.push(Cell::from(Span::styled(&g.name, theme::title())));
-                cells.push(Cell::from(Span::styled(
-                    g.app_id.to_string(),
-                    theme::dim(),
-                )));
+                cells.push(Cell::from(Span::styled(g.app_id.to_string(), theme::dim())));
                 cells.push(Cell::from(Span::styled(size, theme::dim())));
                 if show_lib_path {
                     cells.push(Cell::from(Span::styled(lib_path, theme::dim())));
@@ -183,7 +177,10 @@ pub fn read_dir_entries(path: &std::path::Path) -> Vec<DirEntry> {
                     is_dir: true,
                 });
             } else {
-                files.push(DirEntry { name, is_dir: false });
+                files.push(DirEntry {
+                    name,
+                    is_dir: false,
+                });
             }
         }
     }

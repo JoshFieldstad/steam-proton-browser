@@ -12,10 +12,10 @@ use crossterm::{
 use fuzzy_matcher::FuzzyMatcher;
 use fuzzy_matcher::skim::SkimMatcherV2;
 use ratatui::{
+    Terminal,
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout},
     widgets::{ListState, TableState},
-    Terminal,
 };
 
 use crate::platform::explorer;
@@ -259,7 +259,8 @@ impl AppState {
                 if let Some(ref s) = saved {
                     if let Some(sel) = s.selected {
                         let count = self.filtered_game_indices.len();
-                        self.table_state.select(Some(sel.min(count.saturating_sub(1))));
+                        self.table_state
+                            .select(Some(sel.min(count.saturating_sub(1))));
                     }
                 }
             }
@@ -274,7 +275,8 @@ impl AppState {
                 if let Some(ref s) = saved {
                     if let Some(sel) = s.selected {
                         let count = self.folder_entries.len();
-                        self.list_state.select(Some(sel.min(count.saturating_sub(1))));
+                        self.list_state
+                            .select(Some(sel.min(count.saturating_sub(1))));
                     }
                 } else if !self.folder_entries.is_empty() {
                     self.list_state.select(Some(0));
@@ -285,7 +287,8 @@ impl AppState {
                 if let Some(ref s) = saved {
                     if let Some(sel) = s.selected {
                         let count = self.dir_entries.len();
-                        self.list_state.select(Some(sel.min(count.saturating_sub(1))));
+                        self.list_state
+                            .select(Some(sel.min(count.saturating_sub(1))));
                     }
                 } else if !self.dir_entries.is_empty() {
                     self.list_state.select(Some(0));
@@ -339,9 +342,7 @@ impl AppState {
                 };
                 Some(steamapps.join("common").join(&game.install_dir))
             }
-            View::GameDetail { .. } => {
-                self.folder_entries.get(sel).map(|f| f.path.clone())
-            }
+            View::GameDetail { .. } => self.folder_entries.get(sel).map(|f| f.path.clone()),
             View::FolderBrowser { dir, .. } => {
                 let entry = self.dir_entries.get(sel)?;
                 let name = entry.name.trim_end_matches('/');
@@ -388,12 +389,7 @@ pub fn run(library: Library) -> Result<()> {
                             .iter()
                             .filter_map(|&i| state.library.games.get(i))
                             .collect();
-                        views::render_game_table(
-                            frame,
-                            chunks[1],
-                            &games,
-                            &mut state.table_state,
-                        );
+                        views::render_game_table(frame, chunks[1], &games, &mut state.table_state);
                     }
                     View::GameDetail { .. } => {
                         views::render_folder_list(
@@ -445,8 +441,7 @@ pub fn run(library: Library) -> Result<()> {
                         ("?", "Help"),
                     ],
                 };
-                let hint_refs: Vec<(&str, &str)> =
-                    hints.iter().map(|(a, b)| (*a, *b)).collect();
+                let hint_refs: Vec<(&str, &str)> = hints.iter().map(|(a, b)| (*a, *b)).collect();
                 widgets::render_status_bar(frame, chunks[2], &hint_refs);
             }
         })?;
@@ -500,11 +495,8 @@ pub fn run(library: Library) -> Result<()> {
                         if let Some(sel) = state.selected_index() {
                             match state.current_view().clone() {
                                 View::Library => {
-                                    if let Some(&gi) =
-                                        state.filtered_game_indices.get(sel)
-                                    {
-                                        state
-                                            .push_view(View::GameDetail { game_index: gi });
+                                    if let Some(&gi) = state.filtered_game_indices.get(sel) {
+                                        state.push_view(View::GameDetail { game_index: gi });
                                     }
                                 }
                                 View::GameDetail { game_index } => {
@@ -515,7 +507,10 @@ pub fn run(library: Library) -> Result<()> {
                                         });
                                     }
                                 }
-                                View::FolderBrowser { game_index, ref dir } => {
+                                View::FolderBrowser {
+                                    game_index,
+                                    ref dir,
+                                } => {
                                     if let Some(entry) = state.dir_entries.get(sel) {
                                         let name = entry.name.trim_end_matches('/');
                                         let full_path = dir.join(name);
@@ -538,9 +533,7 @@ pub fn run(library: Library) -> Result<()> {
                             let target = if path.is_dir() {
                                 path
                             } else {
-                                path.parent()
-                                    .map(|p| p.to_path_buf())
-                                    .unwrap_or(path)
+                                path.parent().map(|p| p.to_path_buf()).unwrap_or(path)
                             };
                             let _ = explorer::open_in_file_explorer(&target);
                         }

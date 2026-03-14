@@ -8,7 +8,10 @@ use anyhow::Result;
 use clap::Parser;
 
 #[derive(Parser, Debug)]
-#[command(name = "steam-proton-browser", about = "TUI for browsing Steam & Proton folders")]
+#[command(
+    name = "steam-proton-browser",
+    about = "TUI for browsing Steam & Proton folders"
+)]
 struct Cli {
     /// Override Steam installation path
     #[arg(long)]

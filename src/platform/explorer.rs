@@ -25,9 +25,7 @@ pub fn open_in_editor(path: &Path) -> Result<()> {
         .or_else(|_| std::env::var("VISUAL"))
         .unwrap_or_else(|_| default_editor().to_string());
 
-    let status = Command::new(&editor)
-        .arg(path)
-        .status()?;
+    let status = Command::new(&editor).arg(path).status()?;
 
     if !status.success() {
         bail!("{editor} exited with {status}");

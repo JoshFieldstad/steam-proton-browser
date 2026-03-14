@@ -107,11 +107,10 @@ fn steamapps_dir(lib_folder: &Path) -> PathBuf {
 
 /// Parse a single `appmanifest_<appid>.acf` file into a `GameInfo`.
 fn parse_appmanifest(path: &Path, library_path: &Path) -> Result<GameInfo> {
-    let content = std::fs::read_to_string(path)
-        .with_context(|| format!("reading {}", path.display()))?;
+    let content =
+        std::fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
 
-    let doc = super::acf::parse(&content)
-        .with_context(|| format!("parsing {}", path.display()))?;
+    let doc = super::acf::parse(&content).with_context(|| format!("parsing {}", path.display()))?;
 
     let app_state = doc
         .get("AppState")
@@ -123,15 +122,9 @@ fn parse_appmanifest(path: &Path, library_path: &Path) -> Result<GameInfo> {
         .parse()
         .with_context(|| "invalid appid")?;
 
-    let name = app_state
-        .get_str("name")
-        .unwrap_or("Unknown")
-        .to_string();
+    let name = app_state.get_str("name").unwrap_or("Unknown").to_string();
 
-    let install_dir = app_state
-        .get_str("installdir")
-        .unwrap_or("")
-        .to_string();
+    let install_dir = app_state.get_str("installdir").unwrap_or("").to_string();
 
     let size_on_disk: u64 = app_state
         .get_str("SizeOnDisk")

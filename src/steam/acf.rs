@@ -82,7 +82,10 @@ impl<'a> Parser<'a> {
             let ch = self.input[self.pos];
             if ch.is_ascii_whitespace() {
                 self.pos += 1;
-            } else if ch == b'/' && self.pos + 1 < self.input.len() && self.input[self.pos + 1] == b'/' {
+            } else if ch == b'/'
+                && self.pos + 1 < self.input.len()
+                && self.input[self.pos + 1] == b'/'
+            {
                 // Line comment — skip to end of line
                 while self.pos < self.input.len() && self.input[self.pos] != b'\n' {
                     self.pos += 1;
