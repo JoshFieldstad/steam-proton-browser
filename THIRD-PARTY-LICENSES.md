@@ -84,7 +84,7 @@ with steam-proton-browser.
 | signal-hook-registry | 1.4.8 | MIT OR Apache-2.0 |
 | smallvec | 1.15.1 | MIT OR Apache-2.0 |
 | static_assertions | 1.1.0 | MIT OR Apache-2.0 |
-| steam-proton-browser | 0.1.0 | BSD-3-Clause |
+| steam-proton-browser | 0.2.0 | BSD-3-Clause |
 | strsim | 0.11.1 | MIT |
 | strum | 0.27.2 | MIT |
 | strum_macros | 0.27.2 | MIT |

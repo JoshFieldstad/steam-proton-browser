@@ -17,11 +17,13 @@ Pull requests **may be completely ignored** without explanation. This is not mea
 ### Prerequisites
 
 - **Rust 1.85+** — install via [rustup](https://rustup.rs/)
-- **GNU Make**
-
+- **GNU Make**- **pre-commit** — install via `pip install pre-commit`
 ### Build & Run
 
 ```sh
+# First-time setup — install pre-commit hooks
+make setup
+
 # Debug build
 make build
 
@@ -43,6 +45,7 @@ make help
 
 | Target | Description |
 |--------|-------------|
+| `setup` | Install pre-commit hooks |
 | `build` | Compile debug build |
 | `release` | Compile optimized release build |
 | `run` | Build and run (debug) |
@@ -53,6 +56,7 @@ make help
 | `fmt-check` | Check formatting (CI mode) |
 | `check` | Type-check without producing binaries |
 | `audit` | Audit dependencies for vulnerabilities |
+| `licenses` | Regenerate THIRD-PARTY-LICENSES.md |
 | `watch` | Rebuild on file changes |
 | `clean` | Remove build artifacts |
 | `ci` | Run the full CI check suite |
@@ -73,6 +77,7 @@ make fmt     # auto-format with rustfmt
 ## Code Style
 
 - All repo operations go through `make` targets — don't run raw `cargo` commands in CI or docs.
+- Run `make setup` after cloning to install pre-commit hooks.
 - `make ci` must pass before any PR is considered.
 - No new warnings allowed — `make lint` enforces `-D warnings`.
 

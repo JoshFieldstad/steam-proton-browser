@@ -22,7 +22,7 @@ Steam Proton Browser discovers your installed games, resolves opaque App IDs to 
 
 ### From source
 
-Requires **Rust 1.85+**.
+Requires **Rust 1.94+**.
 
 ```sh
 git clone https://github.com/your-user/steam-proton-browser.git
@@ -102,6 +102,7 @@ When you select a game, Steam Proton Browser shows all existing folders for that
 See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and contribution guidelines.
 
 ```sh
+make setup   # Install pre-commit hooks (one-time)
 make help    # Show all available targets
 make build   # Debug build
 make test    # Run tests
