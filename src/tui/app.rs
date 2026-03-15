@@ -255,12 +255,12 @@ impl AppState {
             View::Library => {
                 self.apply_filter();
                 // Restore selection after filtering (which resets to 0)
-                if let Some(ref s) = saved {
-                    if let Some(sel) = s.selected {
-                        let count = self.filtered_game_indices.len();
-                        self.table_state
-                            .select(Some(sel.min(count.saturating_sub(1))));
-                    }
+                if let Some(ref s) = saved
+                    && let Some(sel) = s.selected
+                {
+                    let count = self.filtered_game_indices.len();
+                    self.table_state
+                        .select(Some(sel.min(count.saturating_sub(1))));
                 }
             }
             View::GameDetail { game_index } => {
@@ -446,122 +446,122 @@ pub fn run(library: Library) -> Result<(), Box<dyn std::error::Error>> {
         })?;
 
         // Event handling
-        if let Event::Key(key) = event::read()? {
-            if let Some(action) = map_key(key, state.filter_mode) {
-                match action {
-                    Action::Quit => break,
-                    Action::MoveDown => state.move_selection(1),
-                    Action::MoveUp => state.move_selection(-1),
-                    Action::JumpTop => state.set_selected(Some(0)),
-                    Action::JumpBottom => {
-                        let count = state.item_count();
-                        if count > 0 {
-                            state.set_selected(Some(count - 1));
-                        }
+        if let Event::Key(key) = event::read()?
+            && let Some(action) = map_key(key, state.filter_mode)
+        {
+            match action {
+                Action::Quit => break,
+                Action::MoveDown => state.move_selection(1),
+                Action::MoveUp => state.move_selection(-1),
+                Action::JumpTop => state.set_selected(Some(0)),
+                Action::JumpBottom => {
+                    let count = state.item_count();
+                    if count > 0 {
+                        state.set_selected(Some(count - 1));
                     }
-                    Action::PageDown => state.move_selection(10),
-                    Action::PageUp => state.move_selection(-10),
-                    Action::ToggleHelp => state.show_help = !state.show_help,
-                    Action::EnterFilter => {
-                        state.filter_mode = true;
-                        state.filter_text.clear();
+                }
+                Action::PageDown => state.move_selection(10),
+                Action::PageUp => state.move_selection(-10),
+                Action::ToggleHelp => state.show_help = !state.show_help,
+                Action::EnterFilter => {
+                    state.filter_mode = true;
+                    state.filter_text.clear();
+                }
+                Action::ExitFilter => {
+                    state.filter_mode = false;
+                    if matches!(state.current_view(), View::Library) {
+                        state.apply_filter();
                     }
-                    Action::ExitFilter => {
-                        state.filter_mode = false;
-                        if matches!(state.current_view(), View::Library) {
-                            state.apply_filter();
-                        }
+                }
+                Action::FilterChar(c) => {
+                    state.filter_text.push(c);
+                    if matches!(state.current_view(), View::Library) {
+                        state.apply_filter();
                     }
-                    Action::FilterChar(c) => {
-                        state.filter_text.push(c);
-                        if matches!(state.current_view(), View::Library) {
-                            state.apply_filter();
-                        }
+                }
+                Action::FilterBackspace => {
+                    state.filter_text.pop();
+                    if matches!(state.current_view(), View::Library) {
+                        state.apply_filter();
                     }
-                    Action::FilterBackspace => {
-                        state.filter_text.pop();
-                        if matches!(state.current_view(), View::Library) {
-                            state.apply_filter();
-                        }
+                }
+                Action::CycleSort => {
+                    if matches!(state.current_view(), View::Library) {
+                        state.sort_mode = state.sort_mode.next();
+                        state.sort_games();
                     }
-                    Action::CycleSort => {
-                        if matches!(state.current_view(), View::Library) {
-                            state.sort_mode = state.sort_mode.next();
-                            state.sort_games();
-                        }
-                    }
-                    Action::Select => {
-                        if let Some(sel) = state.selected_index() {
-                            match state.current_view().clone() {
-                                View::Library => {
-                                    if let Some(&gi) = state.filtered_game_indices.get(sel) {
-                                        state.push_view(View::GameDetail { game_index: gi });
-                                    }
+                }
+                Action::Select => {
+                    if let Some(sel) = state.selected_index() {
+                        match state.current_view().clone() {
+                            View::Library => {
+                                if let Some(&gi) = state.filtered_game_indices.get(sel) {
+                                    state.push_view(View::GameDetail { game_index: gi });
                                 }
-                                View::GameDetail { game_index } => {
-                                    if let Some(folder) = state.folder_entries.get(sel) {
+                            }
+                            View::GameDetail { game_index } => {
+                                if let Some(folder) = state.folder_entries.get(sel) {
+                                    state.push_view(View::FolderBrowser {
+                                        game_index,
+                                        dir: folder.path.clone(),
+                                    });
+                                }
+                            }
+                            View::FolderBrowser {
+                                game_index,
+                                ref dir,
+                            } => {
+                                if let Some(entry) = state.dir_entries.get(sel) {
+                                    let name = entry.name.trim_end_matches('/');
+                                    let full_path = dir.join(name);
+                                    if entry.is_dir {
                                         state.push_view(View::FolderBrowser {
                                             game_index,
-                                            dir: folder.path.clone(),
+                                            dir: full_path,
                                         });
-                                    }
-                                }
-                                View::FolderBrowser {
-                                    game_index,
-                                    ref dir,
-                                } => {
-                                    if let Some(entry) = state.dir_entries.get(sel) {
-                                        let name = entry.name.trim_end_matches('/');
-                                        let full_path = dir.join(name);
-                                        if entry.is_dir {
-                                            state.push_view(View::FolderBrowser {
-                                                game_index,
-                                                dir: full_path,
-                                            });
-                                        } else {
-                                            let _ = explorer::open_file(&full_path);
-                                        }
+                                    } else {
+                                        let _ = explorer::open_file(&full_path);
                                     }
                                 }
                             }
                         }
                     }
-                    Action::Back => state.pop_view(),
-                    Action::OpenExplorer => {
-                        if let Some(path) = state.selected_path() {
-                            let target = if path.is_dir() {
-                                path
-                            } else {
-                                path.parent().map(|p| p.to_path_buf()).unwrap_or(path)
-                            };
-                            let _ = explorer::open_in_file_explorer(&target);
-                        }
+                }
+                Action::Back => state.pop_view(),
+                Action::OpenExplorer => {
+                    if let Some(path) = state.selected_path() {
+                        let target = if path.is_dir() {
+                            path
+                        } else {
+                            path.parent().map(|p| p.to_path_buf()).unwrap_or(path)
+                        };
+                        let _ = explorer::open_in_file_explorer(&target);
                     }
-                    Action::EditFile => {
-                        if let Some(path) = state.selected_path() {
-                            if path.is_file() {
-                                // Suspend TUI, run editor, then restore
-                                disable_raw_mode()?;
-                                execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
-                                terminal.show_cursor()?;
+                }
+                Action::EditFile => {
+                    if let Some(path) = state.selected_path()
+                        && path.is_file()
+                    {
+                        // Suspend TUI, run editor, then restore
+                        disable_raw_mode()?;
+                        execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
+                        terminal.show_cursor()?;
 
-                                let _ = explorer::open_in_editor(&path);
+                        let _ = explorer::open_in_editor(&path);
 
-                                // Restore TUI
-                                enable_raw_mode()?;
-                                execute!(terminal.backend_mut(), EnterAlternateScreen)?;
-                                terminal.hide_cursor()?;
-                                terminal.clear()?;
-                            }
-                        }
+                        // Restore TUI
+                        enable_raw_mode()?;
+                        execute!(terminal.backend_mut(), EnterAlternateScreen)?;
+                        terminal.hide_cursor()?;
+                        terminal.clear()?;
                     }
-                    Action::CopyPath => {
-                        // Path copying — best-effort, no clipboard crate for now
-                        // The path is shown in the breadcrumb, user can also use 'o'
-                    }
-                    Action::Refresh => {
-                        // Would trigger a rescan — for now, noop
-                    }
+                }
+                Action::CopyPath => {
+                    // Path copying — best-effort, no clipboard crate for now
+                    // The path is shown in the breadcrumb, user can also use 'o'
+                }
+                Action::Refresh => {
+                    // Would trigger a rescan — for now, noop
                 }
             }
         }

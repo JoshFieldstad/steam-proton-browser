@@ -64,15 +64,15 @@ pub fn is_valid(cache: &CacheFile, steam_roots: &[PathBuf]) -> bool {
     // Check if libraryfolders.vdf has been modified since last cache write
     for root in steam_roots {
         let vdf_path = root.join("steamapps/libraryfolders.vdf");
-        if let Ok(metadata) = std::fs::metadata(&vdf_path) {
-            if let Ok(modified) = metadata.modified() {
-                let modified_secs = modified
-                    .duration_since(SystemTime::UNIX_EPOCH)
-                    .map(|d| d.as_secs())
-                    .unwrap_or(0);
-                if modified_secs > cache.last_updated {
-                    return false;
-                }
+        if let Ok(metadata) = std::fs::metadata(&vdf_path)
+            && let Ok(modified) = metadata.modified()
+        {
+            let modified_secs = modified
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_secs())
+                .unwrap_or(0);
+            if modified_secs > cache.last_updated {
+                return false;
             }
         }
     }

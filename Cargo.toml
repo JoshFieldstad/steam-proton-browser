@@ -2,15 +2,15 @@
 name = "steam-proton-browser"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.94"
 description = "A TUI for browsing Steam and Proton compatibility layer folders"
 license = "BSD-3-Clause"
 
 [dependencies]
-ratatui = "0.29"
-crossterm = "0.28"
+ratatui = "0.30"
+crossterm = "0.29"
 serde = { version = "1", features = ["derive"] }
-toml = "0.8"
+toml = "1"
 dirs = "6"
 open = "5"
 fuzzy-matcher = "0.3"
