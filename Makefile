@@ -61,6 +61,19 @@ clean: ## Remove build artifacts
 .PHONY: ci
 ci: fmt-check lint test ## Run full CI pipeline locally
 
+.PHONY: coverage
+coverage: ## Run tests with code coverage summary
+	cargo llvm-cov test --text
+
+.PHONY: coverage-report
+coverage-report: ## Generate coverage files for CI (codecov.json + coverage-summary.json)
+	cargo llvm-cov test --codecov --output-path codecov.json
+	cargo llvm-cov test --json --summary-only --output-path coverage-summary.json
+
+.PHONY: test-report
+test-report: ## Generate JUnit XML test report
+	cargo nextest run --profile ci
+
 # ── Help ───────────────────────────────────────────────
 
 .PHONY: help
