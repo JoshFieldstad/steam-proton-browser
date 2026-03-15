@@ -44,7 +44,16 @@ check: ## Type-check without producing binaries
 audit: ## Audit dependencies for vulnerabilities and license issues
 	cargo deny check
 
+.PHONY: licenses
+licenses: ## Regenerate THIRD-PARTY-LICENSES.md
+	cargo about generate about.hbs > THIRD-PARTY-LICENSES.md
+
 # ── Dev ────────────────────────────────────────────────
+
+.PHONY: setup
+setup: ## Install pre-commit hooks
+	pre-commit install
+	@echo "pre-commit hooks installed"
 
 .PHONY: watch
 watch: ## Rebuild on file changes
