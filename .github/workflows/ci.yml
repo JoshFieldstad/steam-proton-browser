@@ -75,7 +75,7 @@ jobs:
 
       - name: Publish test results
         if: always()
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         with:
           report_paths: target/nextest/ci/test-results.xml
           check_name: Test Results
