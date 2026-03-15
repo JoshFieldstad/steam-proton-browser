@@ -59,7 +59,7 @@ jobs:
         if: always()
         uses: mikepenz/action-junit-report@v5
         with:
-          report_paths: test-results.xml
+          report_paths: target/nextest/ci/test-results.xml
           check_name: Test Results
           include_passed: true
 
