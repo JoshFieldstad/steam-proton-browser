@@ -78,10 +78,11 @@ pub fn scan_libraries(steam_roots: &[PathBuf]) -> Result<Library> {
                 None => continue,
             };
 
-            if file_name.starts_with("appmanifest_") && file_name.ends_with(".acf") {
-                if let Ok(game) = parse_appmanifest(&path, lib_folder) {
-                    games.push(game);
-                }
+            if file_name.starts_with("appmanifest_")
+                && file_name.ends_with(".acf")
+                && let Ok(game) = parse_appmanifest(&path, lib_folder)
+            {
+                games.push(game);
             }
         }
     }

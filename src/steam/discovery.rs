@@ -67,12 +67,12 @@ pub fn discover_library_folders(steam_root: &std::path::Path) -> Vec<PathBuf> {
         keys.sort();
 
         for key in keys {
-            if let Some(entry) = lib_folders.get(key.as_str()) {
-                if let Some(path_str) = entry.get_str("path") {
-                    let path = PathBuf::from(path_str);
-                    if path.is_dir() {
-                        folders.push(path);
-                    }
+            if let Some(entry) = lib_folders.get(key.as_str())
+                && let Some(path_str) = entry.get_str("path")
+            {
+                let path = PathBuf::from(path_str);
+                if path.is_dir() {
+                    folders.push(path);
                 }
             }
         }
