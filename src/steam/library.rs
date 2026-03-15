@@ -2,8 +2,9 @@
 
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
+
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 /// Information about a single installed Steam game.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -107,20 +108,21 @@ fn steamapps_dir(lib_folder: &Path) -> PathBuf {
 
 /// Parse a single `appmanifest_<appid>.acf` file into a `GameInfo`.
 fn parse_appmanifest(path: &Path, library_path: &Path) -> Result<GameInfo> {
-    let content =
-        std::fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
+    let content = std::fs::read_to_string(path)
+        .map_err(|e| format!("reading {}: {e}", path.display()))?;
 
-    let doc = super::acf::parse(&content).with_context(|| format!("parsing {}", path.display()))?;
+    let doc = super::acf::parse(&content)
+        .map_err(|e| format!("parsing {}: {e}", path.display()))?;
 
     let app_state = doc
         .get("AppState")
-        .with_context(|| format!("missing AppState in {}", path.display()))?;
+        .ok_or_else(|| format!("missing AppState in {}", path.display()))?;
 
     let app_id: u64 = app_state
         .get_str("appid")
-        .with_context(|| "missing appid")?
+        .ok_or("missing appid")?
         .parse()
-        .with_context(|| "invalid appid")?;
+        .map_err(|e| format!("invalid appid: {e}"))?;
 
     let name = app_state.get_str("name").unwrap_or("Unknown").to_string();
 

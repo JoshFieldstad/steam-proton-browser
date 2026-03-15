@@ -3,7 +3,7 @@
 use std::path::Path;
 use std::process::Command;
 
-use anyhow::{Result, bail};
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 /// Open the given directory in the system's default file manager.
 pub fn open_in_file_explorer(path: &Path) -> Result<()> {
@@ -28,7 +28,7 @@ pub fn open_in_editor(path: &Path) -> Result<()> {
     let status = Command::new(&editor).arg(path).status()?;
 
     if !status.success() {
-        bail!("{editor} exited with {status}");
+        return Err(format!("{editor} exited with {status}").into());
     }
 
     Ok(())

@@ -3,7 +3,6 @@
 use std::io;
 use std::path::PathBuf;
 
-use anyhow::Result;
 use crossterm::{
     event::{self, Event},
     execute,
@@ -352,7 +351,7 @@ impl AppState {
     }
 }
 
-pub fn run(library: Library) -> Result<()> {
+pub fn run(library: Library) -> Result<(), Box<dyn std::error::Error>> {
     // Setup terminal
     enable_raw_mode()?;
     let mut stdout = io::stdout();

@@ -1,9 +1,8 @@
 //! Cache layer — persist discovered Steam paths and app index for fast startup.
 
 use std::path::{Path, PathBuf};
+use std::time::SystemTime;
 
-use anyhow::Result;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::steam::library::{GameInfo, Library};
@@ -14,7 +13,8 @@ const CACHE_VERSION: u32 = 1;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CacheFile {
     pub version: u32,
-    pub last_updated: DateTime<Utc>,
+    /// Seconds since UNIX epoch.
+    pub last_updated: u64,
     pub steam_roots: Vec<CachedRoot>,
     pub library_folders: Vec<CachedLibraryFolder>,
     pub apps: Vec<GameInfo>,
@@ -66,8 +66,11 @@ pub fn is_valid(cache: &CacheFile, steam_roots: &[PathBuf]) -> bool {
         let vdf_path = root.join("steamapps/libraryfolders.vdf");
         if let Ok(metadata) = std::fs::metadata(&vdf_path) {
             if let Ok(modified) = metadata.modified() {
-                let modified: DateTime<Utc> = modified.into();
-                if modified > cache.last_updated {
+                let modified_secs = modified
+                    .duration_since(SystemTime::UNIX_EPOCH)
+                    .map(|d| d.as_secs())
+                    .unwrap_or(0);
+                if modified_secs > cache.last_updated {
                     return false;
                 }
             }
@@ -78,10 +81,13 @@ pub fn is_valid(cache: &CacheFile, steam_roots: &[PathBuf]) -> bool {
 }
 
 /// Write the cache to disk.
-pub fn save(path: &Path, library: &Library, steam_roots: &[PathBuf]) -> Result<()> {
+pub fn save(path: &Path, library: &Library, steam_roots: &[PathBuf]) -> Result<(), Box<dyn std::error::Error>> {
     let cache = CacheFile {
         version: CACHE_VERSION,
-        last_updated: Utc::now(),
+        last_updated: SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0),
         steam_roots: steam_roots
             .iter()
             .map(|p| CachedRoot { path: p.clone() })
@@ -102,4 +108,97 @@ pub fn save(path: &Path, library: &Library, steam_roots: &[PathBuf]) -> Result<(
     std::fs::write(path, content)?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::steam::library::GameInfo;
+
+    fn sample_library() -> Library {
+        Library {
+            steam_roots: vec![PathBuf::from("/home/user/.steam")],
+            library_folders: vec![PathBuf::from("/home/user/.steam/steamapps")],
+            games: vec![GameInfo {
+                app_id: 292030,
+                name: "The Witcher 3".to_string(),
+                install_dir: "The Witcher 3 Wild Hunt".to_string(),
+                library_path: PathBuf::from("/home/user/.steam"),
+                size_on_disk: 48_000_000_000,
+                proton_version: Some("Proton 9.0-4".to_string()),
+                last_played: 1700000000,
+            }],
+        }
+    }
+
+    #[test]
+    fn test_save_and_load_round_trip() {
+        let dir = tempfile::tempdir().unwrap();
+        let cache_path = dir.path().join("cache.toml");
+        let library = sample_library();
+        let roots = vec![PathBuf::from("/home/user/.steam")];
+
+        save(&cache_path, &library, &roots).unwrap();
+
+        let loaded = load(&cache_path).expect("should load saved cache");
+        assert_eq!(loaded.version, CACHE_VERSION);
+        assert!(loaded.last_updated > 0);
+        assert_eq!(loaded.apps.len(), 1);
+        assert_eq!(loaded.apps[0].app_id, 292030);
+        assert_eq!(loaded.apps[0].name, "The Witcher 3");
+        assert_eq!(loaded.steam_roots.len(), 1);
+    }
+
+    #[test]
+    fn test_into_library() {
+        let cache = CacheFile {
+            version: CACHE_VERSION,
+            last_updated: 1700000000,
+            steam_roots: vec![CachedRoot { path: PathBuf::from("/steam") }],
+            library_folders: vec![CachedLibraryFolder { path: PathBuf::from("/steam/steamapps") }],
+            apps: vec![],
+        };
+        let lib = cache.into_library();
+        assert_eq!(lib.steam_roots, vec![PathBuf::from("/steam")]);
+        assert_eq!(lib.library_folders, vec![PathBuf::from("/steam/steamapps")]);
+        assert!(lib.games.is_empty());
+    }
+
+    #[test]
+    fn test_is_valid_wrong_version() {
+        let cache = CacheFile {
+            version: CACHE_VERSION + 1,
+            last_updated: u64::MAX,
+            steam_roots: vec![],
+            library_folders: vec![],
+            apps: vec![],
+        };
+        assert!(!is_valid(&cache, &[]));
+    }
+
+    #[test]
+    fn test_is_valid_correct_version_no_roots() {
+        let cache = CacheFile {
+            version: CACHE_VERSION,
+            last_updated: u64::MAX,
+            steam_roots: vec![],
+            library_folders: vec![],
+            apps: vec![],
+        };
+        // No roots to check means nothing invalidates
+        assert!(is_valid(&cache, &[]));
+    }
+
+    #[test]
+    fn test_load_nonexistent() {
+        assert!(load(Path::new("/nonexistent/cache.toml")).is_none());
+    }
+
+    #[test]
+    fn test_load_invalid_toml() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("bad.toml");
+        std::fs::write(&path, "not valid { toml [").unwrap();
+        assert!(load(&path).is_none());
+    }
 }
