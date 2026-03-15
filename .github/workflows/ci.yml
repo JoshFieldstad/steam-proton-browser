@@ -57,7 +57,7 @@ jobs:
 
       - name: Security audit SARIF
         if: always()
-        run: cargo deny check --format sarif > deny-results.sarif 2>&1 || true
+        run: cargo deny --format sarif check > deny-results.sarif 2>&1 || true
 
       - name: Upload SARIF results
         if: always()
