@@ -108,11 +108,11 @@ fn steamapps_dir(lib_folder: &Path) -> PathBuf {
 
 /// Parse a single `appmanifest_<appid>.acf` file into a `GameInfo`.
 fn parse_appmanifest(path: &Path, library_path: &Path) -> Result<GameInfo> {
-    let content = std::fs::read_to_string(path)
-        .map_err(|e| format!("reading {}: {e}", path.display()))?;
+    let content =
+        std::fs::read_to_string(path).map_err(|e| format!("reading {}: {e}", path.display()))?;
 
-    let doc = super::acf::parse(&content)
-        .map_err(|e| format!("parsing {}: {e}", path.display()))?;
+    let doc =
+        super::acf::parse(&content).map_err(|e| format!("parsing {}: {e}", path.display()))?;
 
     let app_state = doc
         .get("AppState")

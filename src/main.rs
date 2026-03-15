@@ -79,7 +79,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if steam_roots.is_empty() {
-        return Err("No Steam installation found. Use --steam-path to specify one manually.".into());
+        return Err(
+            "No Steam installation found. Use --steam-path to specify one manually.".into(),
+        );
     }
 
     let cache_path = cache::cache_file_path();

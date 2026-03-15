@@ -81,7 +81,11 @@ pub fn is_valid(cache: &CacheFile, steam_roots: &[PathBuf]) -> bool {
 }
 
 /// Write the cache to disk.
-pub fn save(path: &Path, library: &Library, steam_roots: &[PathBuf]) -> Result<(), Box<dyn std::error::Error>> {
+pub fn save(
+    path: &Path,
+    library: &Library,
+    steam_roots: &[PathBuf],
+) -> Result<(), Box<dyn std::error::Error>> {
     let cache = CacheFile {
         version: CACHE_VERSION,
         last_updated: SystemTime::now()
@@ -154,8 +158,12 @@ mod tests {
         let cache = CacheFile {
             version: CACHE_VERSION,
             last_updated: 1700000000,
-            steam_roots: vec![CachedRoot { path: PathBuf::from("/steam") }],
-            library_folders: vec![CachedLibraryFolder { path: PathBuf::from("/steam/steamapps") }],
+            steam_roots: vec![CachedRoot {
+                path: PathBuf::from("/steam"),
+            }],
+            library_folders: vec![CachedLibraryFolder {
+                path: PathBuf::from("/steam/steamapps"),
+            }],
             apps: vec![],
         };
         let lib = cache.into_library();
