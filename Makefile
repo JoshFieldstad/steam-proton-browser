@@ -45,8 +45,8 @@ audit: ## Audit dependencies for vulnerabilities and license issues
 	cargo deny check
 
 .PHONY: licenses
-licenses: ## Regenerate THIRD-PARTY-LICENSES.md
-	cargo about generate about.hbs > THIRD-PARTY-LICENSES.md
+licenses: ## Regenerate THIRD-PARTY-LICENSES
+	cargo about generate about.hbs > THIRD-PARTY-LICENSES
 
 # ── Dev ────────────────────────────────────────────────
 

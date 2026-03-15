@@ -56,7 +56,7 @@ make help
 | `fmt-check` | Check formatting (CI mode) |
 | `check` | Type-check without producing binaries |
 | `audit` | Audit dependencies for vulnerabilities |
-| `licenses` | Regenerate THIRD-PARTY-LICENSES.md |
+| `licenses` | Regenerate THIRD-PARTY-LICENSES |
 | `watch` | Rebuild on file changes |
 | `clean` | Remove build artifacts |
 | `ci` | Run the full CI check suite |

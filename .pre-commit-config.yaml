@@ -24,7 +24,7 @@ repos:
 
       - id: licenses
         name: third-party licenses
-        entry: bash -c 'cargo about generate about.hbs > THIRD-PARTY-LICENSES.md && git add THIRD-PARTY-LICENSES.md'
+        entry: bash -c 'cargo about generate about.hbs > THIRD-PARTY-LICENSES && git add THIRD-PARTY-LICENSES'
         language: system
         pass_filenames: false
         files: (Cargo\.(toml|lock)|about\.(toml|hbs))
