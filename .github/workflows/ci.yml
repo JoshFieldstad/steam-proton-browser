@@ -69,16 +69,34 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const coverage = fs.readFileSync('coverage.txt', 'utf8');
-            const body = `## 📊 Code Coverage\n\n\`\`\`\n${coverage}\n\`\`\``;
+            const data = JSON.parse(fs.readFileSync('coverage-summary.json', 'utf8'));
+            const totals = data.data[0].totals;
+            const files = data.data[0].files;
 
-            // Find and update existing comment, or create a new one
+            const pct = (v) => v.percent.toFixed(1);
+            const ratio = (v) => `${v.covered}/${v.count}`;
+
+            let body = `## Code Coverage\n\n`;
+            body += `| Metric | Coverage | Covered/Total |\n`;
+            body += `|--------|----------|---------------|\n`;
+            body += `| Lines | **${pct(totals.lines)}%** | ${ratio(totals.lines)} |\n`;
+            body += `| Functions | **${pct(totals.functions)}%** | ${ratio(totals.functions)} |\n`;
+            body += `| Regions | **${pct(totals.regions)}%** | ${ratio(totals.regions)} |\n`;
+            body += `\n<details><summary>Per-file breakdown</summary>\n\n`;
+            body += `| File | Lines | Functions |\n`;
+            body += `|------|-------|-----------|\n`;
+            for (const f of files) {
+              const name = f.filename.replace(/.*\/src\//, 'src/');
+              body += `| ${name} | ${pct(f.summary.lines)}% | ${pct(f.summary.functions)}% |\n`;
+            }
+            body += `\n</details>`;
+
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
             });
-            const marker = '## 📊 Code Coverage';
+            const marker = '## Code Coverage';
             const existing = comments.find(c => c.body.startsWith(marker));
 
             if (existing) {
