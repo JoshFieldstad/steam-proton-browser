@@ -19,7 +19,7 @@ jobs:
       security-events: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -27,7 +27,7 @@ jobs:
           components: rustfmt, clippy, llvm-tools-preview
 
       - name: Cache cargo registry & build
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
@@ -53,14 +53,17 @@ jobs:
         uses: taiki-e/install-action@cargo-deny
 
       - name: Security audit (cargo-deny)
+        id: audit
         run: make audit
 
       - name: Security audit SARIF
-        if: always()
-        run: cargo deny --format sarif check > deny-results.sarif 2>&1 || true
+        # Only run when the audit step actually ran (cargo-deny is installed);
+        # keep stderr out of the file so the SARIF stays valid JSON.
+        if: always() && steps.audit.outcome != 'skipped'
+        run: cargo deny --format sarif check > deny-results.sarif || true
 
       - name: Upload SARIF results
-        if: always()
+        if: always() && steps.audit.outcome != 'skipped'
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: deny-results.sarif
@@ -141,7 +144,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -167,7 +170,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache cargo registry & build
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
@@ -230,7 +233,7 @@ jobs:
 
       - name: Create GitHub release
         if: steps.changes.outputs.release == 'true'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: ${{ steps.version.outputs.version }}
