@@ -185,8 +185,8 @@ pub fn read_dir_entries(path: &std::path::Path) -> Vec<DirEntry> {
         }
     }
 
-    dirs.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
-    files.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    dirs.sort_by_key(|e| e.name.to_lowercase());
+    files.sort_by_key(|e| e.name.to_lowercase());
 
     dirs.extend(files);
     dirs

@@ -148,16 +148,13 @@ impl AppState {
             SortMode::LastPlayed => self
                 .library
                 .games
-                .sort_by(|a, b| b.last_played.cmp(&a.last_played)),
-            SortMode::Name => self
-                .library
-                .games
-                .sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase())),
+                .sort_by_key(|g| std::cmp::Reverse(g.last_played)),
+            SortMode::Name => self.library.games.sort_by_key(|g| g.name.to_lowercase()),
             SortMode::AppId => self.library.games.sort_by_key(|g| g.app_id),
             SortMode::Size => self
                 .library
                 .games
-                .sort_by(|a, b| b.size_on_disk.cmp(&a.size_on_disk)),
+                .sort_by_key(|g| std::cmp::Reverse(g.size_on_disk)),
         }
         self.apply_filter();
     }
